@@ -6,11 +6,16 @@
   <title>Ink Fury — Start Menu</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root {
-      --panel: rgba(20,20,20,0.75);
-      --border: rgba(255,255,255,0.15);
+      --bg-color: #000000;
+      --panel-bg: rgba(255, 255, 255, 0.05);
+      --border-color: #ffffff;
+      --text-main: #ffffff;
+      --accent: #ffffff;
+      --button-hover: #dddddd;
     }
 
     * { box-sizing: border-box; }
@@ -19,15 +24,46 @@
       margin: 0;
       height: 100%;
       font-family: 'Press Start 2P', monospace;
-      background: #f5f5f5;
+      background: var(--bg-color);
+      color: var(--text-main);
       overflow: hidden;
     }
 
-    canvas {
+    #bg {
       position: fixed;
       inset: 0;
       z-index: 0;
+      background: #000;
     }
+
+    body::after {
+      content: "";
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 1px, transparent 2px);
+      z-index: 1;
+      mix-blend-mode: overlay;
+    }
+
+    /* PROFILE CARD STYLES */
+    .profile-card {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 15px;
+      border: 1px solid var(--border-color);
+      min-width: 200px;
+    }
+
+    .profile-card i { font-size: 20px; }
+    .profile-card .user-info { font-size: 9px; line-height: 1.4; }
+    .profile-card .username { color: var(--accent); display: block; margin-top: 4px; font-size: 11px; }
 
     .stage {
       position: relative;
@@ -37,116 +73,129 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 22px;
+      gap: 30px;
     }
 
     .logo {
       font-size: 52px;
-      padding: 22px 28px;
-      background: var(--panel);
-      border-radius: 14px;
-      border: 2px solid var(--border);
-      text-shadow: 3px 3px 0 #000;
+      padding: 25px 35px;
+      background: var(--bg-color);
+      border-radius: 4px;
+      border: 4px solid var(--border-color);
+      text-shadow: 4px 4px 0px #333;
+      color: var(--text-main);
+      letter-spacing: 4px;
     }
 
     .controls {
       width: 420px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+      z-index: 3;
     }
 
     .btn {
-      padding: 16px;
-      background: #000;
-      color: #fff;
-      border-radius: 12px;
+      padding: 18px;
+      background: #ffffff;
+      color: #000000;
+      border-radius: 4px;
       border: none;
       cursor: pointer;
       font-family: inherit;
+      font-weight: bold;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      background: var(--button-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255,255,255,0.2);
     }
 
     .btn.secondary {
-      background: #fff;
-      color: #000;
+      background: transparent;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255,255,255,0.1);
     }
 
     footer {
       position: fixed;
-      bottom: 10px;
-      font-size: 9px;
-      opacity: 0.5;
+      bottom: 15px;
+      font-size: 10px;
+      opacity: 0.6;
+      z-index: 3;
+      letter-spacing: 1px;
     }
 
-    /* ONLINE PANEL */
+    /* OVERLAYS (MODALS) */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.65);
+      background: rgba(0,0,0,0.9);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 10;
+      backdrop-filter: blur(5px);
     }
 
     .panel {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      background: var(--panel);
-      padding: 20px;
-      border-radius: 14px;
-      border: 2px solid var(--border);
-      width: 620px;
-    }
-
-    .column {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      text-align: center;
+      gap: 20px;
+      background: #000;
+      padding: 30px;
+      border: 2px solid #fff;
+      width: 450px;
     }
 
-    .title {
-      font-size: 12px;
-      opacity: 0.8;
-      margin-bottom: 6px;
+    .online-panel { width: 650px; display: grid; grid-template-columns: 1fr 1fr; }
+
+    .column { display: flex; flex-direction: column; gap: 15px; text-align: center; }
+
+    .title { 
+      font-size: 14px; color: #fff; margin-bottom: 10px; 
+      border-bottom: 1px solid #fff; padding-bottom: 10px;
     }
+
+    .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .field label { font-size: 9px; opacity: 0.7; text-align: left; }
 
     .room-id {
-      font-size: 10px;
-      padding: 10px;
-      background: #000;
-      color: #0f0;
-      border-radius: 8px;
-      user-select: all;
+      font-size: 10px; padding: 12px; background: #111;
+      color: #fff; border: 1px dashed #fff;
     }
 
     input {
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-family: inherit;
-      text-align: center;
-      font-size: 11px;
+      padding: 12px; border: 1px solid #fff; background: #000;
+      color: #fff; font-family: inherit; text-align: center; font-size: 11px;
     }
 
-    .modes {
-      display: flex;
-      gap: 6px;
-    }
-
-    .modes button {
-      flex: 1;
-      padding: 10px;
-      font-size: 10px;
-    }
+    .modes { display: flex; gap: 8px; }
+    .modes button { flex: 1; padding: 10px; font-size: 9px; }
   </style>
 </head>
-
 <body>
 
 <canvas id="bg"></canvas>
+
+<div class="profile-card">
+  <i class="fa-solid fa-user-circle"></i>
+  <div class="user-info">
+    STATUS: ONLINE<br>
+    <span class="username" id="displayUsername">GUEST_PLAYER</span>
+  </div>
+</div>
 
 <div class="stage">
   <div class="logo">INK FURY</div>
@@ -154,65 +203,150 @@
   <div class="controls">
     <button class="btn" id="vsAiBtn">Play vs AI</button>
     <button class="btn secondary" id="onlineBtn">Play Online</button>
+    <button class="btn secondary" id="optionsBtn">Options</button>
   </div>
 </div>
 
-<footer>Ink Fury • Web Battleground • by Ruben</footer>
+<footer>INK FURY • WEB BATTLEGROUND • RUBEN</footer>
 
-<!-- ONLINE OVERLAY -->
 <div class="overlay" id="onlineOverlay">
-  <div class="panel">
-
-    <!-- CREATE -->
+  <div class="panel online-panel">
     <div class="column">
       <div class="title">CREATE ROOM</div>
-
       <div class="modes">
         <button class="btn secondary modeBtn" data-mode="1v1">1v1</button>
         <button class="btn secondary modeBtn" data-mode="2v2">2v2</button>
         <button class="btn secondary modeBtn" data-mode="4v4">4v4</button>
       </div>
-
       <div class="room-id" id="roomDisplay">ROOM-XXXXXXX</div>
-
-      <button class="btn secondary" id="copyBtn">Copy Room ID</button>
+      <button class="btn secondary" id="copyBtn">Copy ID</button>
       <button class="btn" id="startHost">Start</button>
     </div>
-
-    <!-- JOIN -->
     <div class="column">
       <div class="title">JOIN ROOM</div>
       <input id="joinInput" placeholder="ROOM-XXXXXXX">
       <button class="btn" id="joinBtn">Join</button>
       <button class="btn secondary" id="closeOnline">Cancel</button>
     </div>
+  </div>
+</div>
 
+<div class="overlay" id="optionsOverlay">
+  <div class="panel">
+    <div class="title">SETTINGS</div>
+    <div class="field">
+      <label>CHANGE USERNAME</label>
+      <input type="text" id="usernameInput" maxlength="15" placeholder="Enter name...">
+    </div>
+    <button class="btn" id="saveOptions">Save Changes</button>
+    <button class="btn secondary" id="closeOptions">Cancel</button>
   </div>
 </div>
 
 <script>
-  const overlay = document.getElementById("onlineOverlay");
-  document.getElementById("onlineBtn").onclick = () => overlay.style.display = "flex";
-  document.getElementById("closeOnline").onclick = () => overlay.style.display = "none";
+  /* --- BACKGROUND ANIMATION --- */
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  let shards = [];
+  let mouse = { x: 0, y: 0 };
 
-  document.getElementById("vsAiBtn").onclick = () => {
-    location.href = "game.html?mode=vsai";
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initShards();
+  }
+
+  function initShards() {
+    shards = [];
+    const count = Math.round(Math.max(60, window.innerWidth / 12));
+    for (let i = 0; i < count; i++) {
+      shards.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() * 0.3) + 0.05,
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.008,
+        w: (Math.random() * 20) + 5,
+        h: (Math.random() * 3) + 1,
+        alpha: Math.random() * 0.4 + 0.1 
+      });
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = '#000000'; 
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    shards.forEach(s => {
+      s.x += s.vx + (mouse.x - s.x) * 0.0004;
+      s.y += s.vy + (mouse.y - s.y) * 0.0003;
+      s.rot += s.rotSpeed;
+      if (s.y > canvas.height + 50) s.y = -50;
+      if (s.x > canvas.width + 50) s.x = -50;
+      if (s.x < -50) s.x = canvas.width + 50;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.rot);
+      ctx.globalAlpha = s.alpha;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(-s.w / 2, -s.h / 2, s.w, s.h);
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  resize(); draw();
+
+  /* --- LOCAL STORAGE & PROFILE LOGIC --- */
+  const displayUsername = document.getElementById('displayUsername');
+  const usernameInput = document.getElementById('usernameInput');
+
+  function updateProfileDisplay() {
+    const savedName = localStorage.getItem('inkfury_name') || 'GUEST_PLAYER';
+    displayUsername.textContent = savedName.toUpperCase();
+    usernameInput.value = savedName;
+  }
+
+  document.getElementById('saveOptions').onclick = () => {
+    const newName = usernameInput.value.trim();
+    if (newName) {
+      localStorage.setItem('inkfury_name', newName);
+      updateProfileDisplay();
+      document.getElementById('optionsOverlay').style.display = "none";
+    }
   };
 
-  let selectedMode = "1v1";
+  /* --- UI TOGGLES --- */
+  const onlineOverlay = document.getElementById("onlineOverlay");
+  const optionsOverlay = document.getElementById("optionsOverlay");
 
+  document.getElementById("onlineBtn").onclick = () => onlineOverlay.style.display = "flex";
+  document.getElementById("closeOnline").onclick = () => onlineOverlay.style.display = "none";
+
+  document.getElementById("optionsBtn").onclick = () => optionsOverlay.style.display = "flex";
+  document.getElementById("closeOptions").onclick = () => optionsOverlay.style.display = "none";
+
+  document.getElementById("vsAiBtn").onclick = () => {
+    location.href = `game.html?mode=vsai&user=${displayUsername.textContent}`;
+  };
+
+  /* --- ONLINE ROOM LOGIC --- */
+  let selectedMode = "1v1";
   document.querySelectorAll(".modeBtn").forEach(btn => {
     btn.onclick = () => {
       selectedMode = btn.dataset.mode;
-      document.querySelectorAll(".modeBtn").forEach(b => b.style.opacity = 0.5);
-      btn.style.opacity = 1;
+      document.querySelectorAll(".modeBtn").forEach(b => {
+          b.style.background = "transparent"; b.style.color = "#ffffff";
+      });
+      btn.style.background = "#ffffff"; btn.style.color = "#000000";
     };
   });
 
   function generateRoom() {
     return "ROOM-" + Math.random().toString(36).substring(2, 9).toUpperCase();
   }
-
   const roomId = generateRoom();
   document.getElementById("roomDisplay").textContent = roomId;
 
@@ -222,14 +356,17 @@
   };
 
   document.getElementById("startHost").onclick = () => {
-    location.href = `game.html?mode=online&role=host&team=${selectedMode}&room=${roomId}`;
+    location.href = `game.html?mode=online&role=host&team=${selectedMode}&room=${roomId}&user=${displayUsername.textContent}`;
   };
 
   document.getElementById("joinBtn").onclick = () => {
     const room = document.getElementById("joinInput").value.trim();
     if (!room) return alert("Enter room ID");
-    location.href = `game.html?mode=online&role=join&room=${room}`;
+    location.href = `game.html?mode=online&role=join&room=${room}&user=${displayUsername.textContent}`;
   };
+
+  // Initial Load
+  updateProfileDisplay();
 </script>
 
 </body>
